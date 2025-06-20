@@ -1,0 +1,19 @@
+﻿{
+  "name": "federal-register-analysis-api",
+  "version": "1.0.0",
+  "description": "API server for Federal Register comment analysis",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "start": "bun server.js",
+    "dev": "bun --hot server.js",
+    "test": "bun test"
+  },
+  "dependencies": {
+    "hono": "^4.0.0",
+    "@hono/node-server": "^1.0.0"
+  },
+  "keywords": ["federal-register", "comments", "analysis", "api"],
+  "author": "Your Team",
+  "license": "MIT"
+}

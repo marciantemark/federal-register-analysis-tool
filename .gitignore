@@ -1,0 +1,54 @@
+﻿# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+bun.lockb
+*.log
+
+# Database files (add specific ones you want to ignore)
+*.sqlite
+*.sqlite3
+*.db
+
+# Build outputs
+dist/
+build/
+out/
+
+# IDE files
+.vscode/settings.json
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+
+# Data files (comment out if you want to track them)
+data/databases/*.sqlite
+data/exports/*.json
+
+# Large database files
+*.sqlite-shm
+*.sqlite-wal
+data/databases/CMS-2025-0050-0031.*

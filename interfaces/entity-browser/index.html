@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Federal Register Analysis - Entity Browser</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            background: #f8f9fa;
+            color: #212529;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+
+        .header {
+            background: #ffffff;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 40px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .header h1 {
+            color: #1a365d;
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-align: center;
+            font-family: 'Georgia', serif;
+        }
+
+        .header .subtitle {
+            color: #495057;
+            font-size: 1.1rem;
+            margin-bottom: 25px;
+            text-align: center;
+            font-weight: 400;
+        }
+
+        .nav-links {
+            display: flex;
+            justify-content: center;
+            gap: 0;
+            margin-bottom: 25px;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            overflow: hidden;
+            background: #f8f9fa;
+        }
+
+        .nav-links a {
+            color: #495057;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 12px 20px;
+            border-right: 1px solid #dee2e6;
+            transition: all 0.2s ease;
+            background: #f8f9fa;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            font-size: 0.9rem;
+        }
+
+        .nav-links a:last-child {
+            border-right: none;
+        }
+
+        .nav-links a:hover {
+            background: #e9ecef;
+            color: #1a365d;
+        }
+
+        .nav-links a.active {
+            background: #1a365d;
+            color: #ffffff;
+        }
+
+        .api-status {
+            padding: 10px 16px;
+            border-radius: 4px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            text-align: center;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+        }
+
+        .api-connected {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .api-disconnected {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .sidebar {
+            background: #ffffff;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 25px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            height: fit-content;
+            position: sticky;
+            top: 30px;
+        }
+
+        .sidebar h3 {
+            color: #1a365d;
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #1a365d;
+            font-family: 'Georgia', serif;
+        }
+
+        .entity-search {
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .entity-search input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            background: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            transition: border-color 0.2s ease;
+        }
+
+        .entity-search input:focus {
+            outline: none;
+            border-color: #1a365d;
+            box-shadow: 0 0 0 2px rgba(26, 54, 93, 0.2);
+        }
+
+        .entity-search-clear {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #6c757d;
+            cursor: pointer;
+            font-size: 0.9rem;
+            padding: 2px;
+            display: none;
+        }
+
+        .entity-search-clear:hover {
+            color: #1a365d;
+        }
+
+        .entity-search-clear.show {
+            display: block;
+        }
+
+        .entity-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        .entity-list-header {
+            font-size: 0.8rem;
+            color: #6c757d;
+            margin-bottom: 10px;
+            padding: 5px 0;
+            border-bottom: 1px solid #e9ecef;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+        }
+
+        .no-entities-found {
+            text-align: center;
+            color: #6c757d;
+            font-style: italic;
+            padding: 20px;
+            font-size: 0.9rem;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+        }
+
+        .entity-item {
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .entity-item:hover {
+            background: #e9ecef;
+            border-color: #1a365d;
+        }
+
+        .entity-item.active {
+            background: #1a365d;
+            color: #ffffff;
+            border-color: #1a365d;
+        }
+
+        .entity-name {
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 3px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+        }
+
+        .entity-count {
+            font-size: 0.85rem;
+            opacity: 0.8;
+            margin-bottom: 3px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+        }
+
+        .entity-type {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 500;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+        }
+
+        .main-content {
+            background: #ffffff;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 30px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #1a365d;
+        }
+
+        .content-title {
+            color: #1a365d;
+            font-size: 1.75rem;
+            font-weight: 700;
+            font-family: 'Georgia', serif;
+        }
+
+        .comment-count {
+            background: #1a365d;
+            color: #ffffff;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+        }
+
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .controls input,
+        .controls select {
+            padding: 10px 12px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 0.95rem;
+            transition: border-color 0.2s ease;
+            background: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+        }
+
+        .controls input:focus,
+        .controls select:focus {
+            outline: none;
+            border-color: #1a365d;
+            box-shadow: 0 0 0 2px rgba(26, 54, 93, 0.2);
+        }
+
+        .controls input {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .comment-grid {
+            display: grid;
+            gap: 20px;
+        }
+
+        .comment-card {
+            background: #ffffff;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 25px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.2s ease;
+        }
+
+        .comment-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .comment-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .comment-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #1a365d;
+            margin-bottom: 5px;
+            font-family: 'Georgia', serif;
+        }
+
+        .comment-id {
+            font-size: 0.9rem;
+            color: #6c757d;
+            font-family: 'Courier New', monospace;
+            font-weight: 500;
+        }
+
+        .comment-meta {
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-top: 8px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+        }
+
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .entity-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .entity-tag {
+            background: #e9ecef;
+            color: #495057;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            border: 1px solid #ced4da;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+        }
+
+        .comment-content {
+            color: #495057;
+            line-height: 1.7;
+            margin-bottom: 20px;
+            font-size: 1rem;
+        }
+
+        .summary-label {
+            font-weight: 700;
+            color: #1a365d;
+            margin-bottom: 10px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+        }
+
+        .full-comment {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-left: 4px solid #1a365d;
+            border-radius: 4px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .full-comment h4 {
+            color: #1a365d;
+            font-size: 1rem;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 700;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+        }
+
+        .full-comment-text {
+            color: #495057;
+            white-space: pre-wrap;
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .key-points {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 20px;
+            margin-top: 15px;
+        }
+
+        .key-points h4 {
+            color: #1a365d;
+            font-size: 0.95rem;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 700;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+        }
+
+        .key-points ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .key-points li {
+            padding: 6px 0;
+            position: relative;
+            padding-left: 20px;
+            line-height: 1.5;
+            color: #495057;
+        }
+
+        .key-points li:before {
+            content: "•";
+            color: #1a365d;
+            position: absolute;
+            left: 0;
+            font-weight: bold;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: #6c757d;
+            font-size: 1.1rem;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px;
+            color: #6c757d;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+        }
+
+        .empty-state h3 {
+            color: #1a365d;
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+            font-family: 'Georgia', serif;
+        }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 30px;
+        }
+
+        .pagination button {
+            padding: 8px 12px;
+            border: 1px solid #ced4da;
+            background: #ffffff;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: #495057;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+        }
+
+        .pagination button:hover:not(:disabled) {
+            background: #e9ecef;
+            border-color: #1a365d;
+            color: #1a365d;
+        }
+
+        .pagination button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            background: #f8f9fa;
+        }
+
+        .pagination button.active {
+            background: #1a365d;
+            color: #ffffff;
+            border-color: #1a365d;
+        }
+
+        @media (max-width: 1024px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                position: static;
+                margin-bottom: 20px;
+            }
+
+            .entity-list {
+                max-height: 300px;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            .header {
+                padding: 30px 20px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .nav-links {
+                flex-direction: column;
+            }
+
+            .nav-links a {
+                border-right: none;
+                border-bottom: 1px solid #dee2e6;
+            }
+
+            .nav-links a:last-child {
+                border-bottom: none;
+            }
+
+            .main-content,
+            .sidebar {
+                padding: 20px;
+            }
+
+            .controls {
+                flex-direction: column;
+            }
+
+            .controls input {
+                min-width: auto;
+            }
+
+            .comment-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .entity-tags {
+                margin-top: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Federal Register Analysis Tool</h1>
+            <p class="subtitle">Entity Browser - Public Comment Analysis by Organizations and Key Stakeholders</p>
+
+            <div class="nav-links">
+                <a href="../entity-browser/" class="active">Entity Browser</a>
+                <a href="../theme-explorer/">Theme Explorer</a>
+                <a href="../timeline-view/">Timeline View</a>
+                <a href="../sentiment-dashboard/">Sentiment Dashboard</a>
+                <a href="../admin-panel/">Admin Panel</a>
+            </div>
+
+            <div id="apiStatus" class="api-status">
+                Connecting to API server...
+            </div>
+        </div>
+
+        <div class="dashboard">
+            <div class="sidebar">
+                <h3>Entities & Organizations</h3>
+
+                <div class="entity-search">
+                    <input type="text" id="entitySearchInput" placeholder="Search entities and organizations...">
+                    <button class="entity-search-clear" id="entitySearchClear" onclick="clearEntitySearch()">×</button>
+                </div>
+
+                <div id="entityList" class="entity-list">
+                    <div class="loading">Loading entities...</div>
+                </div>
+            </div>
+
+            <div class="main-content">
+                <div class="content-header">
+                    <h2 class="content-title" id="contentTitle">All Comments</h2>
+                    <div class="comment-count" id="commentCount">0 comments</div>
+                </div>
+
+                <div class="controls">
+                    <input type="text" id="searchInput" placeholder="Search comments, organizations, or content...">
+                    <select id="statusFilter">
+                        <option value="completed">Processed Comments</option>
+                        <option value="pending">Pending Processing</option>
+                        <option value="failed">Failed Processing</option>
+                    </select>
+                </div>
+
+                <div id="commentsContainer" class="comment-grid">
+                    <div class="loading">Loading comments from database...</div>
+                </div>
+
+                <div class="pagination" id="pagination"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const API_BASE_URL = 'http://localhost:3001';
+
+        // State management
+        let allEntities = [];
+        let filteredEntities = [];
+        let selectedEntity = null;
+        let currentPage = 1;
+        let totalPages = 1;
+        let isLoading = false;
+        let currentComments = [];
+        let entitySearchTerm = '';
+
+        // API Functions
+        async function checkApiStatus() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/health`);
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('apiStatus').innerHTML =
+                        `✓ Connected to API server - ${data.service}`;
+                    document.getElementById('apiStatus').className = 'api-status api-connected';
+                    return true;
+                } else {
+                    throw new Error('API server not responding');
+                }
+            } catch (error) {
+                document.getElementById('apiStatus').innerHTML =
+                    '✗ API server disconnected - Check if server is running on port 3001';
+                document.getElementById('apiStatus').className = 'api-status api-disconnected';
+                return false;
+            }
+        }
+
+        async function fetchComments(page = 1, search = '', entity = '', status = 'completed') {
+            if (isLoading) return;
+            isLoading = true;
+
+            try {
+                const params = new URLSearchParams({
+                    page: page.toString(),
+                    limit: '10',
+                    status: status
+                });
+
+                if (search) params.append('search', search);
+                if (entity) params.append('entity', entity);
+
+                const response = await fetch(`${API_BASE_URL}/api/comments?${params}`);
+                const data = await response.json();
+
+                if (data.success) {
+                    currentComments = data.data.comments;
+                    currentPage = data.data.pagination.page;
+                    totalPages = data.data.pagination.totalPages;
+
+                    document.getElementById('commentCount').textContent =
+                        `${data.data.pagination.total} comments`;
+
+                    displayComments();
+                    updatePagination();
+                } else {
+                    throw new Error(data.error || 'Failed to fetch comments');
+                }
+            } catch (error) {
+                console.error('Error fetching comments:', error);
+                document.getElementById('commentsContainer').innerHTML =
+                    `<div class="empty-state">
+                        <h3>Error Loading Comments</h3>
+                        <p>${error.message}</p>
+                        <p>Ensure the API server is running:</p>
+                        <code>cd api && bun run dev</code>
+                    </div>`;
+            } finally {
+                isLoading = false;
+            }
+        }
+
+        async function fetchEntities() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/entities`);
+                const data = await response.json();
+
+                if (data.success) {
+                    allEntities = data.data;
+                    filteredEntities = [...allEntities];
+                    displayEntities();
+                } else {
+                    throw new Error(data.error || 'Failed to fetch entities');
+                }
+            } catch (error) {
+                console.error('Error fetching entities:', error);
+                document.getElementById('entityList').innerHTML =
+                    '<div class="empty-state">Error loading entities</div>';
+            }
+        }
+
+        async function fetchStats() {
+            try {
+                const response = await fetch(`${API_BASE_URL}/api/stats`);
+                const data = await response.json();
+
+                if (data.success) {
+                    console.log('Database stats:', data.data);
+
+                    // Update header with stats
+                    if (data.data.totalComments > 0) {
+                        const completionRate = data.data.completionRate;
+                        document.querySelector('.subtitle').innerHTML =
+                            `Entity Browser - ${data.data.totalComments} total comments, ${completionRate}% processed`;
+                    }
+                }
+            } catch (error) {
+                console.error('Error fetching stats:', error);
+            }
+        }
+
+        // Display Functions
+        function displayEntities() {
+            const entityList = document.getElementById('entityList');
+
+            if (filteredEntities.length === 0 && entitySearchTerm) {
+                entityList.innerHTML = '<div class="no-entities-found">No entities found matching your search</div>';
+                return;
+            }
+
+            if (filteredEntities.length === 0) {
+                entityList.innerHTML = '<div class="empty-state">No entities found</div>';
+                return;
+            }
+
+            // Show search results count if searching
+            let headerHTML = '';
+            if (entitySearchTerm) {
+                headerHTML = `<div class="entity-list-header">Found ${filteredEntities.length} of ${allEntities.length} entities</div>`;
+            }
+
+            const entityHTML = filteredEntities.map(entity => `
+                <div class="entity-item" onclick="selectEntity('${escapeHtml(entity.entity_name)}')">
+                    <div class="entity-name">${highlightSearchTerm(escapeHtml(entity.entity_name), entitySearchTerm)}</div>
+                    <div class="entity-count">${entity.comment_count} comment${entity.comment_count !== 1 ? 's' : ''}</div>
+                    <div class="entity-type">${entity.entity_type || 'extracted'}</div>
+                </div>
+            `).join('');
+
+            entityList.innerHTML = `
+                ${headerHTML}
+                <div class="entity-item ${!selectedEntity ? 'active' : ''}" onclick="selectEntity(null)">
+                    <div class="entity-name">All Comments</div>
+                    <div class="entity-count">View all</div>
+                    <div class="entity-type">overview</div>
+                </div>
+                ${entityHTML}
+            `;
+        }
+
+        function highlightSearchTerm(text, searchTerm) {
+            if (!searchTerm) return text;
+
+            const regex = new RegExp(`(${escapeRegex(searchTerm)})`, 'gi');
+            return text.replace(regex, '<mark style="background-color: #fff3cd; padding: 1px 2px;">$1</mark>');
+        }
+
+        function escapeRegex(string) {
+            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\        // Display Functions
+        function displayEntities() {
+                    const entityList = document.getElementById('entityList');
+
+                    if (allEntities.length === 0) {
+                        entityList.innerHTML = '<div class="empty-state">No entities found</div>';
+                        return;
+                    }
+
+                    const entityHTML = allEntities.map(entity => `
+                <div class="entity-item" onclick="selectEntity('${escapeHtml(entity.entity_name)}')">
+                    <div class="entity-name">${escapeHtml(entity.entity_name)}</div>
+                    <div class="entity-count">${entity.comment_count} comment${entity.comment_count !== 1 ? 's' : ''}</div>
+                    <div class="entity-type">${entity.entity_type || 'extracted'}</div>
+                </div>
+            `).join('');
+
+                    entityList.innerHTML = `
+                <div class="entity-item ${!selectedEntity ? 'active' : ''}" onclick="selectEntity(null)">
+                    <div class="entity-name">All Comments</div>
+                    <div class="entity-count">View all</div>
+                    <div class="entity-type">overview</div>
+                </div>
+                ${entityHTML}
+            `;
+                }');
+        }
+
+        function filterEntities(searchTerm) {
+            entitySearchTerm = searchTerm.toLowerCase();
+
+            if (!entitySearchTerm) {
+                filteredEntities = [...allEntities];
+            } else {
+                filteredEntities = allEntities.filter(entity => {
+                    const name = entity.entity_name.toLowerCase();
+                    const type = (entity.entity_type || '').toLowerCase();
+
+                    return name.includes(entitySearchTerm) ||
+                        type.includes(entitySearchTerm);
+                });
+            }
+
+            displayEntities();
+
+            // Show/hide clear button
+            const clearButton = document.getElementById('entitySearchClear');
+            if (entitySearchTerm) {
+                clearButton.classList.add('show');
+            } else {
+                clearButton.classList.remove('show');
+            }
+        }
+
+        function clearEntitySearch() {
+            document.getElementById('entitySearchInput').value = '';
+            filterEntities('');
+        }
+
+        function selectEntity(entityName) {
+            selectedEntity = entityName;
+            currentPage = 1;
+
+            // Update active state in sidebar
+            document.querySelectorAll('.entity-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.target.closest('.entity-item').classList.add('active');
+
+            // Update content title
+            document.getElementById('contentTitle').textContent =
+                entityName ? `Comments from: ${entityName}` : 'All Comments';
+
+            // Fetch filtered comments
+            const searchTerm = document.getElementById('searchInput').value;
+            const status = document.getElementById('statusFilter').value;
+            fetchComments(1, searchTerm, entityName || '', status);
+        }
+
+        function displayComments() {
+            const container = document.getElementById('commentsContainer');
+
+            if (currentComments.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <h3>No Comments Found</h3>
+                        <p>No comments match the current criteria. Try adjusting your filters or ensure comments have been processed.</p>
+                        ${selectedEntity ? `<p><strong>Current filter:</strong> ${selectedEntity}</p>` : ''}
+                    </div>`;
+                return;
+            }
+
+            const commentsHTML = currentComments.map(comment => {
+                const parsed = comment.parsed_content || {};
+
+                // Extract entities for display
+                let displayEntities = [];
+                if (parsed.entities && Array.isArray(parsed.entities)) {
+                    displayEntities = parsed.entities;
+                } else if (parsed.keyPoints && Array.isArray(parsed.keyPoints)) {
+                    displayEntities = parsed.keyPoints.slice(0, 3);
+                }
+
+                // Get primary entity for title
+                const primaryEntity = displayEntities[0] ||
+                    comment.organization_name ||
+                    parsed.category ||
+                    'Individual Comment';
+
+                // Format dates
+                const submissionDate = comment.submission_date ?
+                    new Date(comment.submission_date).toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    }) : '';
+
+                return `
+                    <div class="comment-card">
+                        <div class="comment-header">
+                            <div>
+                                <div class="comment-title">${escapeHtml(primaryEntity)}</div>
+                                <div class="comment-id">Comment ID: ${escapeHtml(comment.comment_id)}</div>
+                                <div class="comment-meta">
+                                    ${comment.submitter_name ? `<div class="meta-item"><strong>Submitter:</strong> ${escapeHtml(comment.submitter_name)}</div>` : ''}
+                                    ${comment.organization_name ? `<div class="meta-item"><strong>Organization:</strong> ${escapeHtml(comment.organization_name)}</div>` : ''}
+                                    ${submissionDate ? `<div class="meta-item"><strong>Submitted:</strong> ${submissionDate}</div>` : ''}
+                                </div>
+                            </div>
+                            <div class="entity-tags">
+                                ${displayEntities.slice(0, 4).map(entity =>
+                    `<span class="entity-tag">${escapeHtml(entity)}</span>`
+                ).join('')}
+                            </div>
+                        </div>
+                        
+                        <div class="comment-content">
+                            <div class="summary-label">Executive Summary:</div>
+                            ${escapeHtml(parsed.detailedContent || 'Summary not available')}
+                        </div>
+                        
+                        ${comment.original_text ? `
+                            <div class="full-comment">
+                                <h4>Full Comment Text</h4>
+                                <div class="full-comment-text">${escapeHtml(comment.original_text)}</div>
+                            </div>
+                        ` : ''}
+                        
+                        ${parsed.keyPoints && parsed.keyPoints.length > 0 ? `
+                            <div class="key-points">
+                                <h4>Key Points</h4>
+                                <ul>
+                                    ${parsed.keyPoints.map(point => `<li>${escapeHtml(point)}</li>`).join('')}
+                                </ul>
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+            }).join('');
+
+            container.innerHTML = commentsHTML;
+        }
+
+        function updatePagination() {
+            const paginationDiv = document.getElementById('pagination');
+
+            if (totalPages <= 1) {
+                paginationDiv.innerHTML = '';
+                return;
+            }
+
+            let paginationHTML = '';
+
+            // Previous button
+            paginationHTML += `<button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>← Previous</button>`;
+
+            // Page numbers
+            const startPage = Math.max(1, currentPage - 2);
+            const endPage = Math.min(totalPages, currentPage + 2);
+
+            for (let i = startPage; i <= endPage; i++) {
+                paginationHTML += `<button onclick="changePage(${i})" class="${i === currentPage ? 'active' : ''}">${i}</button>`;
+            }
+
+            if (endPage < totalPages) {
+                paginationHTML += `<span>... ${totalPages}</span>`;
+            }
+
+            // Next button
+            paginationHTML += `<button onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>Next →</button>`;
+
+            paginationDiv.innerHTML = paginationHTML;
+        }
+
+        function changePage(page) {
+            if (page >= 1 && page <= totalPages && page !== currentPage) {
+                const searchTerm = document.getElementById('searchInput').value;
+                const status = document.getElementById('statusFilter').value;
+                fetchComments(page, searchTerm, selectedEntity || '', status);
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text || '';
+            return div.innerHTML;
+        }
+
+        // Event Listeners
+        let searchTimeout;
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                currentPage = 1;
+                const status = document.getElementById('statusFilter').value;
+                fetchComments(1, e.target.value, selectedEntity || '', status);
+            }, 500);
+        });
+
+        // Entity search with type-ahead
+        let entitySearchTimeout;
+        document.getElementById('entitySearchInput').addEventListener('input', (e) => {
+            clearTimeout(entitySearchTimeout);
+            entitySearchTimeout = setTimeout(() => {
+                filterEntities(e.target.value);
+            }, 200); // Faster response for type-ahead
+        });
+
+        document.getElementById('statusFilter').addEventListener('change', (e) => {
+            currentPage = 1;
+            const searchTerm = document.getElementById('searchInput').value;
+            fetchComments(1, searchTerm, selectedEntity || '', e.target.value);
+        });
+
+        // Initialize Application
+        async function initializeApp() {
+            const apiConnected = await checkApiStatus();
+
+            if (apiConnected) {
+                await fetchStats();
+                await fetchEntities();
+                await fetchComments();
+            } else {
+                document.getElementById('commentsContainer
