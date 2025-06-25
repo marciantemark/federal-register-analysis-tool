@@ -17,6 +17,7 @@ app.use('/*', cors({
 // Database configuration
 const DB_PATH = process.env.DATABASE_PATH || '../data/databases/CMS-2025-0050-0031.sqlite';
 
+
 function getDb() {
     try {
         return new Database(DB_PATH);

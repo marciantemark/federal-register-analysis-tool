@@ -4,21 +4,43 @@
   "description": "Web platform for analyzing Federal Register public comments",
   "type": "module",
   "scripts": {
-    "api": "cd api && bun run dev",
-    "serve": "bun --serve --port 8000 interfaces/",
-    "dev": "concurrently \"bun run api\" \"bun run serve\"",
-    "build": "echo 'Building for production...'",
-    "setup": "cd api && bun install"
+    "dev": "concurrently \"npm run api:dev\" \"npm run serve:entity\"",
+    "dev:api": "cd api && bun run dev",
+    "dev:all": "concurrently \"npm run api:dev\" \"npm run serve:entity\" \"npm run serve:admin\"",
+    "start": "cd api && bun run start",
+    "api:dev": "cd api && bun run dev",
+    "api:start": "cd api && bun run start",
+    "serve:entity": "cd interfaces/entity-browser && python -m http.server 8000",
+    "serve:admin": "bun --serve --port 8001 interfaces/admin-panel/",
+    "serve:sentiment": "bun --serve --port 8002 interfaces/sentiment-dashboard/",
+    "serve:themes": "bun --serve --port 8003 interfaces/theme-explorer/",
+    "serve:timeline": "bun --serve --port 8004 interfaces/timeline-view/",
+    "build": "echo 'Building for production...' && npm run api:start",
+    "setup": "bun install && cd api && bun install",
+    "test": "cd api && bun test",
+    "clean": "rm -rf node_modules api/node_modules",
+    "db:check": "echo 'Database files:' && dir data\\databases"
   },
-  "workspaces": ["api"],
+  "workspaces": [
+    "api"
+  ],
   "devDependencies": {
     "concurrently": "^8.0.0"
   },
-  "keywords": ["federal-register", "public-comments", "analysis", "visualization"],
-  "author": "Your Team", 
+  "engines": {
+    "node": ">=18.0.0",
+    "bun": ">=1.0.0"
+  },
+  "keywords": [
+    "federal-register",
+    "public-comments",
+    "analysis",
+    "visualization"
+  ],
+  "author": "Your Team",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-org/federal-register-analysis-tool.git"
+    "url": "https://github.com/marciantemark/federal-register-analysis-tool"
   }
 }
