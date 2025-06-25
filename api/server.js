@@ -10,8 +10,9 @@ const app = new Hono();
 // CORS configuration
 app.use('/*', cors({
     origin: ['http://localhost:8000', 'http://localhost:3000', 'http://127.0.0.1:8000'],
-    allowMethods: ['GET', 'POST', 'PUT', 'DELETE'],
-    allowHeaders: ['Content-Type', 'Authorization'],
+    allowMethods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowHeaders: ['Content-Type', 'Authorization', 'Origin', 'Accept'],
+    credentials: true
 }));
 
 // Database configuration

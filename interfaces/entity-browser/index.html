@@ -526,6 +526,196 @@
             border-color: #1a365d;
         }
 
+        /* ========================================
+           SKELETON LOADING ANIMATIONS
+        ======================================== */
+
+        /* Base skeleton styles */
+        .skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 4px;
+        }
+
+        @keyframes loading {
+            0% {
+                background-position: 200% 0;
+            }
+
+            100% {
+                background-position: -200% 0;
+            }
+        }
+
+        /* Entity skeleton items */
+        .entity-skeleton {
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+        }
+
+        .entity-skeleton .skeleton-name {
+            height: 16px;
+            width: 80%;
+            margin-bottom: 6px;
+        }
+
+        .entity-skeleton .skeleton-count {
+            height: 12px;
+            width: 60%;
+            margin-bottom: 4px;
+        }
+
+        .entity-skeleton .skeleton-type {
+            height: 10px;
+            width: 40%;
+        }
+
+        /* Comment card skeleton */
+        .comment-skeleton {
+            background: #ffffff;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            padding: 25px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .comment-skeleton .skeleton-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .comment-skeleton .skeleton-title {
+            height: 24px;
+            width: 70%;
+            margin-bottom: 8px;
+        }
+
+        .comment-skeleton .skeleton-id {
+            height: 14px;
+            width: 40%;
+            margin-bottom: 12px;
+        }
+
+        .comment-skeleton .skeleton-meta {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .comment-skeleton .skeleton-meta-item {
+            height: 12px;
+            width: 80px;
+        }
+
+        .comment-skeleton .skeleton-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .comment-skeleton .skeleton-tag {
+            height: 20px;
+            width: 60px;
+            border-radius: 3px;
+        }
+
+        .comment-skeleton .skeleton-content {
+            margin: 20px 0;
+        }
+
+        .comment-skeleton .skeleton-content-line {
+            height: 16px;
+            margin-bottom: 8px;
+            border-radius: 2px;
+        }
+
+        .comment-skeleton .skeleton-content-line:nth-child(1) {
+            width: 95%;
+        }
+
+        .comment-skeleton .skeleton-content-line:nth-child(2) {
+            width: 88%;
+        }
+
+        .comment-skeleton .skeleton-content-line:nth-child(3) {
+            width: 92%;
+        }
+
+        .comment-skeleton .skeleton-content-line:nth-child(4) {
+            width: 75%;
+        }
+
+        /* Loading state indicators */
+        .loading-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        .loading-spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid #e9ecef;
+            border-top: 2px solid #1a365d;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Fade in animation for loaded content */
+        .fade-in {
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Search loading state */
+        .search-loading {
+            position: relative;
+        }
+
+        .search-loading::after {
+            content: '';
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            border: 2px solid #e9ecef;
+            border-top: 2px solid #1a365d;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
         @media (max-width: 1024px) {
             .dashboard {
                 grid-template-columns: 1fr;
@@ -608,7 +798,10 @@
             </div>
 
             <div id="apiStatus" class="api-status">
-                Connecting to API server...
+                <div class="loading-indicator">
+                    <div class="loading-spinner"></div>
+                    Connecting to API server...
+                </div>
             </div>
         </div>
 
@@ -622,14 +815,19 @@
                 </div>
 
                 <div id="entityList" class="entity-list">
-                    <div class="loading">Loading entities...</div>
+                    <!-- Loading skeletons will be inserted here -->
                 </div>
             </div>
 
             <div class="main-content">
                 <div class="content-header">
                     <h2 class="content-title" id="contentTitle">All Comments</h2>
-                    <div class="comment-count" id="commentCount">0 comments</div>
+                    <div class="comment-count" id="commentCount">
+                        <div class="loading-indicator">
+                            <div class="loading-spinner"></div>
+                            Loading...
+                        </div>
+                    </div>
                 </div>
 
                 <div class="controls">
@@ -642,7 +840,7 @@
                 </div>
 
                 <div id="commentsContainer" class="comment-grid">
-                    <div class="loading">Loading comments from database...</div>
+                    <!-- Loading skeletons will be inserted here -->
                 </div>
 
                 <div class="pagination" id="pagination"></div>
@@ -663,6 +861,65 @@
         let isLoading = false;
         let currentComments = [];
         let entitySearchTerm = '';
+
+        // Loading skeleton generators
+        function createEntitySkeleton() {
+            return `
+                <div class="entity-skeleton">
+                    <div class="skeleton skeleton-name"></div>
+                    <div class="skeleton skeleton-count"></div>
+                    <div class="skeleton skeleton-type"></div>
+                </div>
+            `;
+        }
+
+        function createCommentSkeleton() {
+            return `
+                <div class="comment-skeleton">
+                    <div class="skeleton-header">
+                        <div>
+                            <div class="skeleton skeleton-title"></div>
+                            <div class="skeleton skeleton-id"></div>
+                            <div class="skeleton-meta">
+                                <div class="skeleton skeleton-meta-item"></div>
+                                <div class="skeleton skeleton-meta-item"></div>
+                                <div class="skeleton skeleton-meta-item"></div>
+                            </div>
+                        </div>
+                        <div class="skeleton-tags">
+                            <div class="skeleton skeleton-tag"></div>
+                            <div class="skeleton skeleton-tag"></div>
+                            <div class="skeleton skeleton-tag"></div>
+                        </div>
+                    </div>
+                    <div class="skeleton-content">
+                        <div class="skeleton skeleton-content-line"></div>
+                        <div class="skeleton skeleton-content-line"></div>
+                        <div class="skeleton skeleton-content-line"></div>
+                        <div class="skeleton skeleton-content-line"></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function showEntitySkeletons() {
+            const entityList = document.getElementById('entityList');
+            entityList.innerHTML = Array(8).fill().map(() => createEntitySkeleton()).join('');
+        }
+
+        function showCommentSkeletons() {
+            const container = document.getElementById('commentsContainer');
+            container.innerHTML = Array(5).fill().map(() => createCommentSkeleton()).join('');
+        }
+
+        function setSearchLoading(isLoading) {
+            const searchInput = document.getElementById('searchInput');
+            if (isLoading) {
+                searchInput.classList.add('search-loading');
+            } else {
+                searchInput.classList.remove('search-loading');
+            }
+        }
 
         // API Functions
         async function checkApiStatus() {
@@ -689,6 +946,18 @@
             if (isLoading) return;
             isLoading = true;
 
+            // Show loading skeletons immediately
+            showCommentSkeletons();
+            setSearchLoading(true);
+
+            // Update comment count with loading state
+            document.getElementById('commentCount').innerHTML = `
+                <div class="loading-indicator">
+                    <div class="loading-spinner"></div>
+                    Loading...
+                </div>
+            `;
+
             try {
                 const params = new URLSearchParams({
                     page: page.toString(),
@@ -710,26 +979,35 @@
                     document.getElementById('commentCount').textContent =
                         `${data.data.pagination.total} comments`;
 
-                    displayComments();
-                    updatePagination();
+                    // Add fade-in animation to loaded content
+                    setTimeout(() => {
+                        displayComments();
+                        updatePagination();
+                        document.getElementById('commentsContainer').classList.add('fade-in');
+                    }, 300); // Small delay to show loading state
                 } else {
                     throw new Error(data.error || 'Failed to fetch comments');
                 }
             } catch (error) {
                 console.error('Error fetching comments:', error);
                 document.getElementById('commentsContainer').innerHTML =
-                    `<div class="empty-state">
+                    `<div class="empty-state fade-in">
                         <h3>Error Loading Comments</h3>
                         <p>${error.message}</p>
                         <p>Ensure the API server is running:</p>
                         <code>cd api && bun run dev</code>
                     </div>`;
+                document.getElementById('commentCount').textContent = '0 comments';
             } finally {
                 isLoading = false;
+                setSearchLoading(false);
             }
         }
 
         async function fetchEntities() {
+            // Show loading skeletons immediately
+            showEntitySkeletons();
+
             try {
                 const response = await fetch(`${API_BASE_URL}/api/entities`);
                 const data = await response.json();
@@ -737,14 +1015,19 @@
                 if (data.success) {
                     allEntities = data.data;
                     filteredEntities = [...allEntities];
-                    displayEntities();
+
+                    // Add fade-in animation to loaded content
+                    setTimeout(() => {
+                        displayEntities();
+                        document.getElementById('entityList').classList.add('fade-in');
+                    }, 300);
                 } else {
                     throw new Error(data.error || 'Failed to fetch entities');
                 }
             } catch (error) {
                 console.error('Error fetching entities:', error);
                 document.getElementById('entityList').innerHTML =
-                    '<div class="empty-state">Error loading entities</div>';
+                    '<div class="empty-state fade-in">Error loading entities</div>';
             }
         }
 
@@ -815,32 +1098,7 @@
         }
 
         function escapeRegex(string) {
-            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\        // Display Functions
-        function displayEntities() {
-                    const entityList = document.getElementById('entityList');
-
-                    if (allEntities.length === 0) {
-                        entityList.innerHTML = '<div class="empty-state">No entities found</div>';
-                        return;
-                    }
-
-                    const entityHTML = allEntities.map(entity => `
-                <div class="entity-item" onclick="selectEntity('${escapeHtml(entity.entity_name)}')">
-                    <div class="entity-name">${escapeHtml(entity.entity_name)}</div>
-                    <div class="entity-count">${entity.comment_count} comment${entity.comment_count !== 1 ? 's' : ''}</div>
-                    <div class="entity-type">${entity.entity_type || 'extracted'}</div>
-                </div>
-            `).join('');
-
-                    entityList.innerHTML = `
-                <div class="entity-item ${!selectedEntity ? 'active' : ''}" onclick="selectEntity(null)">
-                    <div class="entity-name">All Comments</div>
-                    <div class="entity-count">View all</div>
-                    <div class="entity-type">overview</div>
-                </div>
-                ${entityHTML}
-            `;
-                }');
+            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\                        <code>cd api && b');
         }
 
         function filterEntities(searchTerm) {
@@ -888,7 +1146,7 @@
             document.getElementById('contentTitle').textContent =
                 entityName ? `Comments from: ${entityName}` : 'All Comments';
 
-            // Fetch filtered comments
+            // Fetch filtered comments with loading state
             const searchTerm = document.getElementById('searchInput').value;
             const status = document.getElementById('statusFilter').value;
             fetchComments(1, searchTerm, entityName || '', status);
@@ -976,6 +1234,11 @@
             }).join('');
 
             container.innerHTML = commentsHTML;
+
+            // Remove fade-in class after animation completes
+            setTimeout(() => {
+                container.classList.remove('fade-in');
+            }, 300);
         }
 
         function updatePagination() {
@@ -1014,6 +1277,12 @@
                 const searchTerm = document.getElementById('searchInput').value;
                 const status = document.getElementById('statusFilter').value;
                 fetchComments(page, searchTerm, selectedEntity || '', status);
+
+                // Scroll to top of comments
+                document.getElementById('commentsContainer').scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
             }
         }
 
@@ -1027,6 +1296,8 @@
         let searchTimeout;
         document.getElementById('searchInput').addEventListener('input', (e) => {
             clearTimeout(searchTimeout);
+            setSearchLoading(true);
+
             searchTimeout = setTimeout(() => {
                 currentPage = 1;
                 const status = document.getElementById('statusFilter').value;
@@ -1034,12 +1305,20 @@
             }, 500);
         });
 
-        // Entity search with type-ahead
+        // Entity search with type-ahead and loading state
         let entitySearchTimeout;
         document.getElementById('entitySearchInput').addEventListener('input', (e) => {
             clearTimeout(entitySearchTimeout);
+
+            // Show mini loading indicator for entity search
+            const entityList = document.getElementById('entityList');
+            if (e.target.value) {
+                entityList.style.opacity = '0.7';
+            }
+
             entitySearchTimeout = setTimeout(() => {
                 filterEntities(e.target.value);
+                entityList.style.opacity = '1';
             }, 200); // Faster response for type-ahead
         });
 
@@ -1051,11 +1330,41 @@
 
         // Initialize Application
         async function initializeApp() {
+            // Show initial loading skeletons
+            showEntitySkeletons();
+            showCommentSkeletons();
+
             const apiConnected = await checkApiStatus();
 
             if (apiConnected) {
+                // Load data with staggered timing for better UX
                 await fetchStats();
                 await fetchEntities();
                 await fetchComments();
             } else {
-                document.getElementById('commentsContainer
+                document.getElementById('commentsContainer').innerHTML = `
+                    <div class="empty-state fade-in">
+                        <h3>API Connection Failed</h3>
+                        <p>Could not connect to the API server. Please ensure:</p>
+                        <ul style="text-align: left; margin: 20px 0;">
+                            <li>API server is running: <code>cd api && bun run dev</code></li>
+                            <li>Server is accessible at http://localhost:3001</li>
+                            <li>No firewall is blocking the connection</li>
+                        </ul>
+                    </div>`;
+
+                document.getElementById('entityList').innerHTML = `
+                    <div class="empty-state">
+                        <p>Entities unavailable</p>
+                    </div>`;
+
+                document.getElementById('commentCount').textContent = '0 comments';
+            }
+        }
+
+        // Start the application when page loads
+        document.addEventListener('DOMContentLoaded', initializeApp);
+    </script>
+</body>
+
+</html>
